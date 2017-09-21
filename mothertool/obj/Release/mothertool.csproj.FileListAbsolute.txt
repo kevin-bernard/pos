@@ -1,0 +1,11 @@
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\bin\Release\mothertool.exe.config
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\bin\Release\mothertool.exe
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\bin\Release\mothertool.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\bin\Release\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\bin\Release\cryptography.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.csprojResolveAssemblyReference.cache
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.Form1.resources
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.Properties.Resources.resources
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.csproj.GenerateResource.Cache
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.exe
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\mothertool\obj\Release\mothertool.pdb

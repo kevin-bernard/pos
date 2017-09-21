@@ -1,0 +1,5 @@
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Release\cryptography.dll.config
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Release\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Release\cryptography.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\obj\Release\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\obj\Release\cryptography.pdb

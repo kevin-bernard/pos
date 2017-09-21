@@ -1,0 +1,10 @@
+D:\Documents\Projects\App\mothertool\accouting_system_manager\cryptography\bin\Debug\cryptography.dll.config
+D:\Documents\Projects\App\mothertool\accouting_system_manager\cryptography\bin\Debug\cryptography.dll
+D:\Documents\Projects\App\mothertool\accouting_system_manager\cryptography\bin\Debug\cryptography.pdb
+D:\Documents\Projects\App\mothertool\accouting_system_manager\cryptography\obj\Debug\cryptography.dll
+D:\Documents\Projects\App\mothertool\accouting_system_manager\cryptography\obj\Debug\cryptography.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Debug\cryptography.dll.config
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Debug\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\bin\Debug\cryptography.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\obj\Debug\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\cryptography\obj\Debug\cryptography.pdb

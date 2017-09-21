@@ -1,0 +1,121 @@
+﻿2017-09-11 09:53:54.599 [ERROR]   Incorrect syntax near '='.
+2017-09-11 09:53:54.810 [ERROR]   Incorrect syntax near '='.
+2017-09-11 16:21:06.103 [ERROR]   Invalid column name 'MY'.
+Invalid column name 'CODE2'.
+2017-09-11 16:38:08.061 [ERROR]   Invalid column name 'MY'.
+Invalid column name 'CODE2'.
+2017-09-11 16:39:41.880 [ERROR]   Invalid column name 'MY'.
+Invalid column name 'CODE2'.
+2017-09-11 16:42:32.700 [ERROR]   Invalid column name 'MY'.
+Invalid column name 'CODE2'.
+2017-09-11 16:46:24.617 [ERROR]   Invalid column name 'MY'.
+Invalid column name 'CODE2'.
+2017-09-12 09:01:05.480 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:02:41.026 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:03:07.709 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:04:18.986 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:05:14.107 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:06:19.664 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:08:07.914 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:09:04.991 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:09:47.922 [ERROR]   Invalid object name 'atrand'.
+2017-09-12 09:24:10.325 [ERROR]   An item with the same key has already been added.
+2017-09-12 11:49:55.015 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:49:55.119 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:49:55.259 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:49:55.381 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:49:55.515 [ERROR]   Incorrect syntax near the keyword 'user'.
+2017-09-12 11:49:55.620 [ERROR]   Invalid object name 'artrand'.
+2017-09-12 11:49:55.747 [ERROR]   Invalid object name 'arcash'.
+2017-09-12 11:50:43.825 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:50:43.936 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:50:44.044 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:50:44.159 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:50:44.277 [ERROR]   Invalid object name 'artrand'.
+2017-09-12 11:50:44.399 [ERROR]   Invalid object name 'arcash'.
+2017-09-12 11:51:18.031 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:51:18.148 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:51:18.250 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:51:18.361 [ERROR]   Incorrect syntax near ')'.
+2017-09-12 11:51:20.852 [ERROR]   Invalid object name 'artrand'.
+2017-09-12 11:51:20.970 [ERROR]   Invalid object name 'arcash'.
+2017-09-12 11:53:17.859 [ERROR]   ExecuteReader: Connection property has not been initialized.
+2017-09-12 11:53:17.969 [ERROR]   ExecuteReader: Connection property has not been initialized.
+2017-09-12 11:54:02.577 [ERROR]   ExecuteReader: Connection property has not been initialized.
+2017-09-12 13:58:35.241 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 13:58:56.506 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 13:58:58.624 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 13:59:08.030 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:00:46.778 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:01:16.053 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:04:36.959 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:06:20.079 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:10:03.216 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:11:19.083 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-12 14:14:20.934 [ERROR]   The conversion of a varchar data type to a datetime data type resulted in an out-of-range value.
+2017-09-12 14:14:28.351 [ERROR]   The conversion of a varchar data type to a datetime data type resulted in an out-of-range value.
+2017-09-12 14:16:13.184 [ERROR]   The conversion of a varchar data type to a datetime data type resulted in an out-of-range value.
+2017-09-12 14:16:17.663 [ERROR]   The conversion of a varchar data type to a datetime data type resulted in an out-of-range value.
+2017-09-13 09:46:39.001 [ERROR]   Incorrect syntax near the keyword 'from'.
+2017-09-13 09:46:39.219 [ERROR]   Incorrect syntax near the keyword 'from'.
+2017-09-13 09:46:39.384 [ERROR]   Incorrect syntax near the keyword 'from'.
+2017-09-13 09:46:39.557 [ERROR]   Incorrect syntax near the keyword 'from'.
+2017-09-13 10:15:33.557 [ERROR]   invdate
+2017-09-13 10:15:33.620 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:15:33.671 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.511 [ERROR]   invdate
+2017-09-13 10:17:27.561 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.655 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.715 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.759 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.822 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.888 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:27.979 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.033 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.099 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.141 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.197 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.288 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.335 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.396 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.447 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.509 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.598 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-13 10:17:28.654 [ERROR]   There is already an open DataReader associated with this Command which must be closed first.
+2017-09-14 11:56:05.040 [ERROR]   Incorrect syntax near the keyword 'user'.
+2017-09-14 13:33:41.125 [ERROR]   Incorrect syntax near ')'.
+2017-09-14 13:33:41.333 [ERROR]   Incorrect syntax near ')'.
+2017-09-14 13:33:41.550 [ERROR]   Incorrect syntax near ')'.
+2017-09-14 13:33:41.754 [ERROR]   Incorrect syntax near ')'.
+2017-09-14 13:33:41.912 [ERROR]   Incorrect syntax near the keyword 'user'.
+2017-09-14 13:33:42.167 [ERROR]   Invalid object name 'artrand'.
+2017-09-14 13:33:43.116 [ERROR]   Invalid object name 'arcash'.
+2017-09-14 13:33:43.999 [ERROR]   Invalid object name 'arcash'.
+2017-09-14 13:33:55.323 [ERROR]   Invalid object name 'artrand'.
+2017-09-14 13:34:05.352 [ERROR]   Invalid object name 'artrand'.
+2017-09-14 13:36:01.208 [ERROR]   Incorrect syntax near the keyword 'user'.
+2017-09-15 11:36:15.398 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:37:35.408 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:38:07.051 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:40:08.296 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:40:58.294 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:43:34.649 [ERROR]   An item with the same key has already been added.
+2017-09-15 11:44:37.783 [ERROR]   An item with the same key has already been added.
+2017-09-15 16:45:51.111 [ERROR]   Incorrect syntax near the keyword 'user'.
+2017-09-16 18:08:47.135 [ERROR]   Incorrect syntax near the keyword 'FROM'.
+2017-09-17 12:09:44.264 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 12:10:32.571 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 12:11:04.335 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:21:11.284 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:21:17.544 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:21:24.621 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:22:13.474 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:22:38.906 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:22:58.563 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:25:18.912 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:27:45.883 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:28:32.551 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:31:21.258 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:31:31.457 [ERROR]   Ambiguous column name 'itemcode'.
+2017-09-17 14:53:32.377 [ERROR]   cost
+2017-09-17 14:53:53.015 [ERROR]   cost

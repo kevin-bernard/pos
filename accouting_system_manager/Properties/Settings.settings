@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="accouting_system_manager.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SERVER_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\SQL</Value>
+    </Setting>
+    <Setting Name="DB_PASSWORD" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DB_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ESQ</Value>
+    </Setting>
+    <Setting Name="DB_USER" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AUTH_LOGIN" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">6j5fQf0yK3jdREHsPTWJfcLb+98fNQ4gJu9KGcgB/dodTcRkHScNp7YCwZ270Ww8myMFIl/xfXIxsEhd8gYifGxpI0UoUX9TyHObg62YkxkBvbdxCt2Fo1jfevRJUa1i</Value>
+    </Setting>
+    <Setting Name="AUTH_PASS" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2tQSwVxOg971RUNJtlJWMMNoG4u0omK48/n91e0P+FxS0EsOF3A++UO9siDJlrOscQpdFopOrrQR9EIMkhWQZHU2Nf8ZFfUn2/FyEjZ7Fq92WXxj8iSBt4XjCqim4lpq</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
