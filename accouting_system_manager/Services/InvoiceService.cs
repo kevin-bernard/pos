@@ -59,35 +59,7 @@ namespace accouting_system_manager.Services
         
         public static void RestoreInvoices(List<Artran> invoices, RunAction callbackProgress) {
 
-            int max = 1;
-
-            callbackProgress?.Invoke(new RunActionProgress() { Cursor = 0, NbData = invoices.Count, Message = "Prepare invoices" });
-
-            DBManager.RunQueryResults("SELECT MAX(invno) invno FROM artran", (SqlDataReader r) =>
-            {
-                int.TryParse(r["invno"].ToString(), out max);
-            });
-
-            int i = 0;
-
-            Dictionary<string, string> numbers = new Dictionary<string, string>();
-
-            foreach (var invoice in invoices) {
-
-                i++;
-                int no = 0;
-
-                if (int.TryParse(invoice.invno, out no))
-                {
-                    string newNo = (max + no).ToString();
-
-                    SetRemovedInvoiceNumber(invoice.invno, newNo);
-
-                    invoice.invno = newNo;
-                }
-                
-                callbackProgress?.Invoke(new RunActionProgress() { Cursor = i, NbData = invoices.Count, Message = "Prepare invoices" });
-            }
+            PrepareInvoiceNumbers(invoices, callbackProgress);
 
             var keys = string.Join(",", invoices.Select(invoice => invoice.invno));
             
@@ -132,7 +104,7 @@ namespace accouting_system_manager.Services
             var invoices = new List<Artran>();
             var caData = GetCa(from, to);
 
-            DBManager.RunQueryResults(string.Format("SELECT artran.*, arcash.paidamt, arcash.currency FROM arcash inner join artran on artran.invno = arcash.invno WHERE artran.invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59'", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
+            DBManager.RunQueryResults(string.Format("SELECT artran.*, arcash.paidamt, arcash.currency FROM arcash inner join artran on artran.invno = arcash.invno WHERE artran.invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59' ORDER BY arcash.paidamt DESC", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
             {
                 double paidamt;
                 
@@ -193,7 +165,7 @@ namespace accouting_system_manager.Services
 
         private static int RemoveData(List<Artran> invoices, RunAction callbackProgress = null)
         {
-            var i = 0;
+            PrepareInvoiceNumbers(invoices, callbackProgress, false);
 
             var keys = string.Join(",", invoices.Select(invoice => invoice.invno));
 
@@ -212,7 +184,7 @@ namespace accouting_system_manager.Services
 
             ReloadInvoiceNumbers(callbackProgress);
             
-            return i;
+            return invoices.Count;
         }
 
         private static bool SwitchDataFromTableToTable(string from, string to, string ids, string key = "invno")
@@ -345,12 +317,58 @@ namespace accouting_system_manager.Services
             callbackProgress?.Invoke(progress);
         }
 
-        private static void SetRemovedInvoiceNumber(string baseInvno, string newInvno)
+        private static void PrepareInvoiceNumbers(List<Artran> invoices, RunAction callbackProgress, bool rollback = true)
         {
-            DBManager.ExecuteQuery(string.Format("update artrand SET invno={0} WHERE invno={1}", newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update arcashd SET invno={0}, ponum='Payment on invoice {0}', octn='R{0}', applyto='l{0}' WHERE invno={1}", newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update ictrand SET docno={0}, reference='Invoice {0}' WHERE docno={1}", newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update armasterd SET invno={0},  octn='l{0}' WHERE invno={1}", newInvno, baseInvno));
+            
+            callbackProgress?.Invoke(new RunActionProgress() { Cursor = 0, NbData = invoices.Count, Message = "Prepare invoices" });
+            
+            Dictionary<string, string> numbers = new Dictionary<string, string>();
+
+            int i = 0,
+                maxArtrand = GetMaxInvno("artrand"),
+                maxArtran = GetMaxInvno();
+
+            int max = maxArtran > maxArtrand ? maxArtran : maxArtrand;
+
+            foreach (var invoice in invoices)
+            {
+
+                i++;
+                int no = 0;
+
+                if (int.TryParse(invoice.invno, out no))
+                {
+                    string newNo = (max + i).ToString();
+
+                    SetRemovedInvoiceNumber(invoice.invno, newNo, rollback);
+
+                    invoice.invno = newNo;
+                }
+
+                callbackProgress?.Invoke(new RunActionProgress() { Cursor = i, NbData = invoices.Count, Message = "Prepare invoices" });
+            }
+        }
+
+        private static void SetRemovedInvoiceNumber(string baseInvno, string newInvno, bool rollback)
+        {
+            var tableSuffix = rollback ? "d" : string.Empty;
+
+            DBManager.ExecuteQuery(string.Format("update artran{0} SET invno={1} WHERE invno={2}", tableSuffix, newInvno, baseInvno));
+            DBManager.ExecuteQuery(string.Format("update arcash{0} SET invno={1}, ponum='Payment on invoice {1}', octn='R{1}', applyto='l{1}' WHERE invno={2}", tableSuffix, newInvno, baseInvno));
+            DBManager.ExecuteQuery(string.Format("update ictran{0} SET docno={1}, reference='Invoice {1}' WHERE docno={2}", tableSuffix, newInvno, baseInvno));
+            DBManager.ExecuteQuery(string.Format("update armaster{0} SET invno={1},  octn='l{1}' WHERE invno={2}", tableSuffix, newInvno, baseInvno));
+        }
+
+        private static int GetMaxInvno(string table = "artran")
+        {
+            int max = 1;
+
+            DBManager.RunQueryResults(string.Format("SELECT MAX(invno) invno FROM {0}", table), (SqlDataReader r) =>
+            {
+                int.TryParse(r["invno"].ToString(), out max);
+            });
+
+            return max;
         }
 
         private static string GetTableColumns(string table)
