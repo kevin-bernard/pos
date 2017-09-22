@@ -354,7 +354,7 @@
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Invno";
+            this.columnHeader5.Text = "Invoice number";
             this.columnHeader5.Width = 155;
             // 
             // columnHeader4
