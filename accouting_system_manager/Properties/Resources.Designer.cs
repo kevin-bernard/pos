@@ -81,6 +81,27 @@ namespace accouting_system_manager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SET ANSI_PADDING ON; 
+        ///GO
+        ///CREATE TABLE itemtrantmp(itemcode [nvarchar](25), qtyorder [decimal](18, 6), qtystock [decimal](18, 6), totalqtyorder [decimal](18, 6) NULL, [lastsale] [datetime] NULL, [cost] [decimal](18, 6) NULL);.
+        /// </summary>
+        internal static string create_table_itemtrantmp {
+            get {
+                return ResourceManager.GetString("create_table_itemtrantmp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap db_backup {
+            get {
+                object obj = ResourceManager.GetObject("db_backup", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap db_config {
@@ -96,6 +117,16 @@ namespace accouting_system_manager.Properties {
         internal static System.Drawing.Bitmap db_config_hover {
             get {
                 object obj = ResourceManager.GetObject("db_config_hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap db_export {
+            get {
+                object obj = ResourceManager.GetObject("db_export", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

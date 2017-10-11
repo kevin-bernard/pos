@@ -1,0 +1,13 @@
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\tests.exe.config
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\tests.exe
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\tests.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\accouting_system_manager.exe
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\cryptography.dll
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\accouting_system_manager.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\bin\Debug\cryptography.pdb
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.csprojResolveAssemblyReference.cache
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.Form1.resources
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.Properties.Resources.resources
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.csproj.GenerateResource.Cache
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.exe
+D:\Documents\Projects\App\pos\pos\accouting_system_manager\tests\obj\Debug\tests.pdb

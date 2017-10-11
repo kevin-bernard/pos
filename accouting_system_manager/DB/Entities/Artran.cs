@@ -12,6 +12,8 @@ namespace accouting_system_manager.DB.Entities
         
         public string qtyorder { get; set; }
 
+        public double totalprice { get; set; }
+
         public string itemcode { get; set; }
 
         public string fprice { get; set; }
@@ -19,6 +21,22 @@ namespace accouting_system_manager.DB.Entities
         public string invdate { get; set; }
 
         public string cost { get; set; }
+
+        public int GetInvnoToInt() {
+            int no = 0;
+
+            int.TryParse(invno, out no);
+
+            return no;
+        }
+
+        public DateTime GetInvdateToDateTime() {
+            DateTime date;
+
+            DateTime.TryParse(invdate, out date);
+
+            return date;
+        }
 
     }
 }

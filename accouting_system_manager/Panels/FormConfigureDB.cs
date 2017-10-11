@@ -28,6 +28,10 @@ namespace accouting_system_manager.Panels
             txtDbName.Text = Properties.Settings.Default.DB_NAME;
             txtUsername.Text = Properties.Settings.Default.DB_USER;
             txtPassword.Text = Properties.Settings.Default.DB_PASSWORD;
+
+            btnSave.Enabled = DBManager.IsConnectionOpen();
+
+            saveFileDialog1.Filter = "Text files (*.bak)|*.bak|All files (*.*)|*.*";
         }
 
         private void btnTest_Click(object sender, EventArgs e)
@@ -50,6 +54,25 @@ namespace accouting_system_manager.Panels
                 MessageBox.Show("authentication error!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 OnLoginAttempt?.Invoke(false);
+            }
+
+            btnSave.Enabled = DBManager.IsConnectionOpen();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.ShowDialog();
+        }
+        
+        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+            if (DBManager.Backup(Properties.Settings.Default.DB_NAME, saveFileDialog1.FileName))
+            {
+                MessageBox.Show(string.Format("DB saved here: {0}", saveFileDialog1.FileName), "Success", MessageBoxButtons.OK);
+            }
+            else
+            {
+                MessageBox.Show("The DB can't be saved", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

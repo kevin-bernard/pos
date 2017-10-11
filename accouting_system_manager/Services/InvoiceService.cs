@@ -20,29 +20,40 @@ namespace accouting_system_manager.Services
 
         public static Dictionary<string, List<Artran>> GetRemovedInvoices(DateTime from, DateTime to)
         {
-            Dictionary<string, List<Artran>> invoices = new Dictionary<string, List<Artran>>();
+            return GetInvoices(from, to);
+        }
 
-            DBManager.RunQueryResults(string.Format("SELECT * FROM artrand WHERE invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59' ORDER BY invdate", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
+        public static Dictionary<string, List<Artran>> GetCurrentInvoices(DateTime from, DateTime to)
+        {
+            return GetInvoices(from, to, false);
+        }
+
+        public static int GetMaxInvoiceNum() {
+            int no = 0;
+
+            DBManager.RunQueryResults("SELECT MAX(invno) invno FROM arcash", (SqlDataReader r) =>
             {
-                var invno = reader["invno"].ToString();
-
-                if (!invoices.ContainsKey(invno))
-                {
-                    invoices[invno] = new List<Artran>();
-                }
-
-                invoices[invno].Add(new Artran()
-                {
-                    invno = invno,
-                    fprice = reader["fprice"].ToString(),
-                    invdate = reader["invdate"].ToString(),
-                    itemcode = reader["itemcode"].ToString(),
-                    qtyorder = reader["qtyorder"].ToString(),
-                });
-                
+                int.TryParse(r["invno"].ToString(), out no);
             });
 
-            return invoices;
+            return no;
+        }
+
+        public static List<int> GetTransactionNoList()
+        {
+            List<int> nums = new List<int>();
+
+            DBManager.RunQueryResults("SELECT arcash.* FROM arcash ORDER BY arcash.invno", (SqlDataReader reader) =>
+            {
+                int invno = 0;
+
+                if (int.TryParse(reader["invno"].ToString(), out invno))
+                {
+                    nums.Add(invno);
+                }
+            });
+
+            return nums;
         }
 
         public static Dictionary<string, double> GetCa(DateTime from, DateTime to)
@@ -59,7 +70,16 @@ namespace accouting_system_manager.Services
         
         public static void RestoreInvoices(List<Artran> invoices, RunAction callbackProgress) {
 
-            PrepareInvoiceNumbers(invoices, callbackProgress);
+            int fstNo = 0;
+
+            DateTime fstDate = invoices.Min(i => i.GetInvdateToDateTime());
+
+            DBManager.RunQueryResults(string.Format("SELECT MIN(invno) invno FROM arcash WHERE invdate>='{0}'", GetStrDateDbFormat(fstDate)), (SqlDataReader r) =>
+            {
+                int.TryParse(r["invno"].ToString(), out fstNo);
+            });
+            
+            invoices = PrepareInvoiceNumbers(invoices, callbackProgress);
 
             var keys = string.Join(",", invoices.Select(invoice => invoice.invno));
             
@@ -74,9 +94,9 @@ namespace accouting_system_manager.Services
 
             callbackProgress?.Invoke(new RunActionProgress() { Cursor = keys.Length, NbData = keys.Length, Message = "Restore invoices" });
             
-            ReloadStockFromInvoices(invoices, callbackProgress);
+            ReloadStockFromInvoices(invoices, true, callbackProgress);
 
-            ReloadInvoiceNumbers(callbackProgress);
+            ReloadInvoiceNumbersFrom(fstNo, callbackProgress);
         }
 
         public static int RemoveNbPercent(decimal percent, DateTime from, DateTime to, RunAction callbackProgress)
@@ -104,28 +124,36 @@ namespace accouting_system_manager.Services
             var invoices = new List<Artran>();
             var caData = GetCa(from, to);
 
-            DBManager.RunQueryResults(string.Format("SELECT artran.*, arcash.paidamt, arcash.currency FROM arcash inner join artran on artran.invno = arcash.invno WHERE artran.invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59' ORDER BY arcash.paidamt DESC", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
+            var ids = new List<string>();
+
+            DBManager.RunQueryResults(string.Format("SELECT * FROM arcash WHERE arcash.invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59' ORDER BY arcash.paidamt DESC", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
             {
                 double paidamt;
-                
-                if (double.TryParse(reader["paidamt"].ToString(), out paidamt) && caData.ContainsKey(reader["currency"].ToString())) {
+
+                if (double.TryParse(reader["paidamt"].ToString(), out paidamt) && caData.ContainsKey(reader["currency"].ToString()))
+                {
                     if (caData[reader["currency"].ToString()] > minCa && caData[reader["currency"].ToString()] - paidamt >= minCa)
                     {
+                        ids.Add(reader["invno"].ToString());
                         caData[reader["currency"].ToString()] -= paidamt;
-
-                        invoices.Add(new Artran()
-                        {
-                            invno = reader["invno"].ToString(),
-                            cost = reader["cost"].ToString(),
-                            fprice = reader["fprice"].ToString(),
-                            invdate = reader["invdate"].ToString(),
-                            itemcode = reader["itemcode"].ToString(),
-                            qtyorder = reader["qtyorder"].ToString(),
-                        });
-                    }
-                    
+                    }   
                 }
 
+            });
+
+            var keys = string.Join(",", ids);
+
+            DBManager.RunQueryResults(string.Format("SELECT * FROM artran  WHERE invno IN ({0})", keys), (SqlDataReader reader) =>
+            {
+                invoices.Add(new Artran()
+                {
+                    invno = reader["invno"].ToString(),
+                    cost = reader["cost"].ToString(),
+                    fprice = reader["fprice"].ToString(),
+                    invdate = reader["invdate"].ToString(),
+                    itemcode = reader["itemcode"].ToString(),
+                    qtyorder = reader["qtyorder"].ToString(),
+                });
             });
 
             RemoveData(invoices, callbackProgress);
@@ -135,7 +163,7 @@ namespace accouting_system_manager.Services
         {
             var count = 0;
 
-            DBManager.RunQueryResults(string.Format("SELECT COUNT(*) total FROM artran WHERE invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59'", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (System.Data.SqlClient.SqlDataReader reader) =>
+            DBManager.RunQueryResults(string.Format("SELECT COUNT(*) total FROM arcash WHERE invdate BETWEEN '{0} 00:00:00' AND '{1} 23:59:59'", GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (System.Data.SqlClient.SqlDataReader reader) =>
             {
                 count = int.Parse(reader["total"].ToString());
             });
@@ -145,7 +173,7 @@ namespace accouting_system_manager.Services
 
         private static int RemoveNbData(int nbData, DateTime from, DateTime to, RunAction callbackProgress = null)
         {
-            var query = string.Format("SELECT TOP {0} * FROM artran where invdate BETWEEN '{1} 00:00:00' AND '{2} 23:59:59' ORDER BY invdate DESC", nbData, GetStrDateDbFormat(from), GetStrDateDbFormat(to));
+            var query = string.Format("SELECT * FROM artran where invno IN (SELECT TOP {0} invno FROM arcash WHERE invdate BETWEEN '{1} 00:00:00' AND '{2} 23:59:59' ORDER BY invdate DESC)", nbData, GetStrDateDbFormat(from), GetStrDateDbFormat(to));
             List<Artran> invoices = new List<Artran>();
 
             DBManager.RunQueryResults(query, (SqlDataReader reader) =>
@@ -165,7 +193,11 @@ namespace accouting_system_manager.Services
 
         private static int RemoveData(List<Artran> invoices, RunAction callbackProgress = null)
         {
-            PrepareInvoiceNumbers(invoices, callbackProgress, false);
+            int fstNo = invoices.Min(i => i.GetInvnoToInt());
+
+            foreach (var inv in invoices) Console.WriteLine(inv.invno);
+
+            invoices = PrepareInvoiceNumbers(invoices, callbackProgress, false);
 
             var keys = string.Join(",", invoices.Select(invoice => invoice.invno));
 
@@ -180,9 +212,9 @@ namespace accouting_system_manager.Services
 
             callbackProgress?.Invoke(new RunActionProgress() { Cursor = keys.Length, NbData = keys.Length, Message = "Delete invoices" });
             
-            ReloadStockFromInvoices(invoices, callbackProgress);
+            ReloadStockFromInvoices(invoices, false, callbackProgress);
 
-            ReloadInvoiceNumbers(callbackProgress);
+            ReloadInvoiceNumbersFrom(fstNo, callbackProgress);
             
             return invoices.Count;
         }
@@ -191,110 +223,207 @@ namespace accouting_system_manager.Services
         {
             var success = true;
 
-            try
+            if (IsTableHasIdentityInsert(to))
             {
                 DBManager.ExecuteQuery(string.Format("SET IDENTITY_INSERT {0} ON;", to));
-            }
-            catch(Exception e){
-                Console.WriteLine(e.Message);
             }
 
             var cols = GetTableColumns(from);
             cols = cols.Equals(string.Empty) ? GetTableColumns(to) : cols;
 
-            try
+            if (DBManager.ExecuteQuery(string.Format("INSERT INTO {0} ({1}) SELECT * FROM {2} WHERE {3} IN ({4});", to, cols, from, key, ids)) <= 0)
             {
-                DBManager.ExecuteQuery(string.Format("INSERT INTO {0} ({1}) SELECT * FROM {2} WHERE {3} IN ({4});", to, cols, from, key, ids));
-            }
-            catch (Exception e) {
-                Console.WriteLine(e.Message);
                 success = false;
             }
-            
-            try
+
+            if (IsTableHasIdentityInsert(to))
             {
                 DBManager.ExecuteQuery(string.Format("SET IDENTITY_INSERT {0} OFF;", to));
             }
-            catch { }
 
             if(success) DBManager.ExecuteQuery(string.Format("DELETE FROM {0} WHERE {1} IN ({2})", from, key, ids));
 
             return success;
         }
 
-        private static void ReloadStockFromInvoices(List<Artran> invoices, RunAction callbackProgress = null)
+        private static void ReloadStockFromInvoices(List<Artran> invoices, bool rollback, RunAction callbackProgress = null)
         {
-            var productsConsumptions = new Dictionary<string, List<Artran>>();
-            int i = 0;
+            
+            var consumptions = GetItemConsumptions(invoices);
+            var progress = new RunActionProgress() { Cursor = 0, NbData = 5, Message = "Reload Stock" };
+
+            callbackProgress?.Invoke(progress);
+
+            DBManager.ExecuteQuery("ALTER TABLE itemtrantmp ALTER COLUMN itemcode [nvarchar](25) COLLATE Croatian_BIN");
+            DBManager.ExecuteQuery("DELETE FROM itemtrantmp;");
+
+            StoreOrderedItems(consumptions);
+
+            progress.Cursor = 1;
+            callbackProgress?.Invoke(progress);
+
+            string op = rollback ? "+" : "-";
+
+            DBManager.ExecuteQuery(string.Format(@"UPDATE itemtrantmp SET 
+                                     totalqtyorder=(SELECT SUM(artran.qtyorder) FROM artran where artran.itemcode=itemtrantmp.itemcode), 
+                                     lastsale=(select MAX(artran.invdate) FROM artran where artran.itemcode=itemtrantmp.itemcode), 
+                                     cost=(SELECT SUM(artran.cost * artran.qtyorder) FROM artran where artran.itemcode=itemtrantmp.itemcode), 
+                                     qtystock=(
+                                    (
+                                         SELECT SUM(stockqty)
+                                         FROM ictran
+                                         where ictran.itemcode=itemtrantmp.itemcode AND trantype='R'
+                                    ) - 
+                                    (
+                                        SELECT (CASE WHEN SUM(artran.qtyorder) IS NOT NULL THEN SUM(artran.qtyorder) ELSE 0 END) 
+	                                    FROM artran where artran.itemcode=itemtrantmp.itemcode)
+                                    ) {0} itemtrantmp.qtyorder
+                                    FROM itemtrantmp inner join artran on itemtrantmp.itemcode=artran.itemcode", op));
+
+            if (rollback)
+            {
+                DBManager.ExecuteQuery("UPDATE ic SET ic.tranqty=(ic.tranqty + tmp.qtyorder), ic.stockqty=(ic.tranqty + tmp.qtyorder) FROM ictran ic inner join itemtrantmp tmp on tmp.itemcode=ic.itemcode WHERE trantype='R' AND tranno=(SELECT MAX(tranno) FROM ictran ic2 where ic2.itemcode=tmp.itemcode AND trantype='R')");
+            }
+            else
+            {
+
+                double tranqty;
+                List<string> queries = new List<string>();
+                Dictionary<string, int> stocks = new Dictionary<string, int>();
+
+                DBManager.ExecuteQuery("UPDATE ic SET ic.tranqty=(CASE WHEN (ic.tranqty - tmp.qtyorder > 0) THEN (ic.tranqty - tmp.qtyorder) ELSE 0 END), ic.stockqty=(CASE WHEN (ic.tranqty - tmp.qtyorder > 0) THEN (ic.tranqty - tmp.qtyorder) ELSE 0 END) FROM ictran ic inner join itemtrantmp tmp on tmp.itemcode=ic.itemcode WHERE trantype='R' AND tranno=(SELECT MAX(tranno) FROM ictran ic2 where ic2.itemcode=tmp.itemcode AND trantype='R') AND (SELECT COUNT(*) FROM ictran ic3 where ic3.itemcode=tmp.itemcode AND trantype='R') <= 1;");
+
+                DBManager.RunQueryResults("SELECT ic.*, (SELECT COUNT(*) FROM [ESQ+].[dbo].[ictran] ic2 WHERE ic2.itemcode = ic.itemcode AND ic2.trantype = 'R') total FROM ictran ic WHERE ic.trantype='R' AND ic.itemcode IN (SELECT itemcode FROM itemtrantmp) AND (SELECT COUNT(*) FROM ictran ic2 WHERE ic2.itemcode = ic.itemcode AND ic2.trantype = 'R') > 1 ORDER BY itemcode ASC, trandate DESC", (SqlDataReader r) =>
+                {
+                    int total = 0;
+                    int.TryParse(r["total"].ToString(), out total);
+
+                    if (!stocks.ContainsKey(r["itemcode"].ToString())) stocks.Add(r["itemcode"].ToString(), total);
+
+                    if (consumptions.ContainsKey(r["itemcode"].ToString()) && consumptions[r["itemcode"].ToString()] > 0 && double.TryParse(r["tranqty"].ToString(), out tranqty))
+                    {
+                        if (tranqty > consumptions[r["itemcode"].ToString()])
+                        {
+                            var totalRemaining = tranqty - consumptions[r["itemcode"].ToString()];
+
+                            queries.Add(string.Format("UPDATE ictran SET tranqty={0}, stockqty={0} WHERE tranno={1}", totalRemaining, r["tranno"].ToString()));
+
+                            consumptions[r["itemcode"].ToString()] = 0;
+                        }
+                        else
+                        {
+                            if (stocks[r["itemcode"].ToString()] > 1)
+                            {
+                                queries.Add(string.Format("DELETE FROM ictran WHERE tranno={0}", r["tranno"].ToString()));
+                                stocks[r["itemcode"].ToString()]--;
+                                consumptions[r["itemcode"].ToString()] -= tranqty;
+                            }
+                            else
+                            {
+                                queries.Add(string.Format("UPDATE ictran SET tranqty=0, stockqty=0 WHERE tranno={0}", r["tranno"].ToString()));
+                                consumptions[r["itemcode"].ToString()] = 0;
+                            }
+                        }
+                    }
+                });
+
+                DBManager.ExecuteQueries(queries);
+            }
+
+            DBManager.ExecuteQuery("UPDATE icitemlocation SET ytdsaleqty=itemtrantmp.totalqtyorder, lastreceipt=(SELECT MAX(trandate) FROM ictran WHERE itemcode=icitemlocation.itemcode AND trantype='R'), ptdsaleqty=itemtrantmp.totalqtyorder, ptdsalevalue=itemtrantmp.cost, ytdsalevalue=itemtrantmp.cost, lastsale=itemtrantmp.lastsale, edtdatetime=itemtrantmp.lastsale FROM icitemlocation inner join itemtrantmp ON icitemlocation.itemcode=itemtrantmp.itemcode;");
+            progress.Cursor = 2;
+            callbackProgress?.Invoke(progress);
+
+            DBManager.ExecuteQuery("UPDATE icitemqty SET issuedate=itemtrantmp.lastsale, edtdatetime=itemtrantmp.lastsale, salesynqty=itemtrantmp.totalqtyorder FROM icitemqty inner join itemtrantmp on itemtrantmp.itemcode=icitemqty.itemcode;");
+            progress.Cursor = 3;
+            callbackProgress?.Invoke(progress);
+
+            DBManager.ExecuteQuery("UPDATE icitemmaster SET ytdsaleqty=itemtrantmp.totalqtyorder, lastreceipt=(SELECT MAX(trandate) FROM ictran WHERE itemcode=icitemmaster.itemcode AND trantype='R'), ptdsaleqty=itemtrantmp.totalqtyorder, ytdsalevalue=itemtrantmp.cost, lastsale=itemtrantmp.lastsale FROM icitemmaster inner join itemtrantmp on itemtrantmp.itemcode=icitemmaster.itemcode;");
+            progress.Cursor = 4;
+            callbackProgress?.Invoke(progress);
+
+            DBManager.ExecuteQuery("ALTER TABLE itemtrantmp ALTER COLUMN itemcode [nvarchar](25) COLLATE SQL_Latin1_General_CP1_CI_AS");
+            progress.Cursor = 5;
+            callbackProgress?.Invoke(progress);
+
+            //DBManager.ExecuteQuery("UPDATE iccost SET orgqty=itemtrantmp.qtystock FROM iccost inner join itemtrantmp on itemtrantmp.itemcode=iccost.itemcode;");
+            //progress.Cursor = 6;
+            //callbackProgress?.Invoke(progress);
+        }
+
+        private static void StoreOrderedItems(Dictionary<string, double> productsConsumptions)
+        {
+            var queries = DBManager.ExplodeQueryInMany("INSERT INTO itemtrantmp(itemcode, qtyorder) VALUES ", productsConsumptions);
+
+            DBManager.ExecuteQueries(queries);
+
+            //int i = 0;
+            //var query = ;
+            //
+            //foreach (var itemcode in productsConsumptions.Keys)
+            //{
+            //    if (i++ > 0)
+            //    {
+            //        query += ",";
+            //    }
+            //
+            //    query += string.Format("('{0}', {1})", itemcode, productsConsumptions[itemcode]);
+            //}
+            //
+            //DBManager.ExecuteQuery(query);
+        }
+
+        private static Dictionary<string, double> GetItemConsumptions(List<Artran> invoices)
+        {
+            var productsConsumptions = new Dictionary<string, double>();
+            double qtyOrdered = 0;
 
             foreach (var invoice in invoices)
             {
-                if (!productsConsumptions.ContainsKey(invoice.itemcode) && invoice.itemcode != null) productsConsumptions[invoice.itemcode] = new List<Artran>();
+                if (!productsConsumptions.ContainsKey(invoice.itemcode) && invoice.itemcode != null) productsConsumptions[invoice.itemcode] = 0;
 
-                productsConsumptions[invoice.itemcode].Add(invoice);
+                if (double.TryParse(invoice.qtyorder, out qtyOrdered))
+                {
+                    productsConsumptions[invoice.itemcode] += qtyOrdered;
+                }
             }
 
-            callbackProgress?.Invoke(new RunActionProgress() { Cursor =  0, NbData = productsConsumptions.Keys.Count, Message = "Reload Stock" });
-            
-            foreach (var itemcode in productsConsumptions.Keys)
-            {
-                ReloadStockForItem(itemcode);
-                i++;
-                callbackProgress?.Invoke(new RunActionProgress() { Cursor = i, NbData = productsConsumptions.Keys.Count, Message = "Reload Stock" });
-            }
+            return productsConsumptions;
         }
-
-        private static void ReloadStockForItem(string itemcode)
-        {
-            double totalQtyOrdered = 0, onHand = 0, cost = 0;
-            
-            string invdate = string.Empty;
-            
-            DBManager.RunQueryResults(string.Format("select MAX(invdate) invdate, SUM(qtyorder) qtyorder, SUM(cost * qtyorder) cost, (SELECT MAX(stockqty) FROM ictran where itemcode='{0}' AND trantype='R') - (CASE WHEN SUM(qtyorder) IS NOT NULL THEN SUM(qtyorder) ELSE 0 END) onHand FROM artran WHERE itemcode='{0}';", itemcode), (SqlDataReader reader) =>
-            {
-                double.TryParse(reader["cost"].ToString(), out cost);
-                invdate = reader["invdate"].ToString();
-                double.TryParse(reader["qtyorder"].ToString(), out totalQtyOrdered);
-                double.TryParse(reader["onHand"].ToString(), out onHand);
-            });
-            
-            DBManager.ExecuteQuery(string.Format("UPDATE icitemlocation SET ytdsaleqty={0}, ptdsaleqty={0}, loconhand={1}, ptdsalevalue={2}, ytdsalevalue={2}, lastsale='{3}', edtdatetime='{3}' WHERE itemcode='{4}';", totalQtyOrdered, onHand, cost, invdate, itemcode));
-            DBManager.ExecuteQuery(string.Format("UPDATE icitemqty SET qonhand={0}, issuedate='{1}', edtdatetime='{1}', salesynqty={2} WHERE itemcode='{3}';", onHand, invdate, totalQtyOrdered, itemcode));
-            DBManager.ExecuteQuery(string.Format("UPDATE iccost SET conhand={0} WHERE itemcode='{1}';", onHand, itemcode));
-            DBManager.ExecuteQuery(string.Format("UPDATE icitemmaster SET ytdsaleqty={0}, ptdsaleqty={0}, ytdsalevalue={1}, lastsale='{2}', qtyonhand={3} WHERE itemcode='{4}';", totalQtyOrdered, cost, invdate, onHand, itemcode));
-        }
-
-        private static void ReloadInvoiceNumbers(RunAction callbackProgress)
+        
+        private static void ReloadInvoiceNumbersFrom(int fromNo, RunAction callbackProgress)
         {
             var progress = new RunActionProgress() { Cursor = 0, NbData = 5, Message = "Reset invoice numbering" };
 
             callbackProgress?.Invoke(progress);
-            //
-            DBManager.ExecuteQuery("DELETE FROM artrantmp");
-            DBManager.ExecuteQuery("DBCC CHECKIDENT (artrantmp, RESEED, 0)");
 
-            //arcash, ictran (reference=Invoice {id}, docno), armaster, 
-            DBManager.ExecuteQuery("INSERT INTO artrantmp(invno) SELECT invno from artran group by invno order by MAX(invdate)");
+            DBManager.ExecuteQuery("TRUNCATE TABLE artrantmp");
+
+            //DBManager.ExecuteQuery("DELETE FROM artrantmp");
+
+            DBManager.ExecuteQuery(string.Format("DBCC CHECKIDENT (artrantmp, RESEED, {0})", (fromNo - 1)));
+
+            DBManager.ExecuteQuery(string.Format("INSERT INTO artrantmp(invno) SELECT invno from arcash WHERE invno >={0} GROUP BY invno order by MAX(invdate)", fromNo));
                 
             progress.Cursor = 1;
             callbackProgress?.Invoke(progress);
 
-            DBManager.ExecuteQuery("update artran SET artran.invno=artrantmp.id from artran inner join artrantmp on artran.invno=artrantmp.invno");
+            DBManager.ExecuteQuery("update ar SET ar.invno=artrantmp.id from artran ar inner join artrantmp on ar.invno=artrantmp.invno");
 
             progress.Cursor = 2;
             callbackProgress?.Invoke(progress);
                 
-            DBManager.ExecuteQuery("update arcash SET arcash.invno=artrantmp.id,  ponum='Payment on invoice ' + CAST(artrantmp.id AS VARCHAR), octn='R' + CAST(artrantmp.id AS VARCHAR), applyto='l' + CAST(artrantmp.id AS VARCHAR) from arcash inner join artrantmp on arcash.invno=artrantmp.invno");
+            DBManager.ExecuteQuery("update ar SET ar.invno=artrantmp.id,  ponum='Payment on invoice ' + CAST(artrantmp.id AS VARCHAR), octn='R' + CAST(artrantmp.id AS VARCHAR), applyto='l' + CAST(artrantmp.id AS VARCHAR), ar.receiptno=(artrantmp.id + 1) from arcash ar inner join artrantmp on ar.invno=artrantmp.invno");
 
             progress.Cursor = 3;
             callbackProgress?.Invoke(progress);
 
-            DBManager.ExecuteQuery("update ictran SET ictran.docno=artrantmp.id, reference='Invoice ' + CAST(artrantmp.id AS VARCHAR) from ictran inner join artrantmp on ictran.docno=artrantmp.invno");
+            DBManager.ExecuteQuery("update ic SET ic.docno=artrantmp.id, reference='Invoice ' + CAST(artrantmp.id AS VARCHAR) from ictran ic inner join artrantmp on ic.docno=artrantmp.invno WHERE ic.trantype='l'");
 
             progress.Cursor = 4;
             callbackProgress?.Invoke(progress);
 
-            DBManager.ExecuteQuery("update armaster SET armaster.invno=artrantmp.id, octn='l' + CAST(artrantmp.id AS VARCHAR) from armaster inner join artrantmp on armaster.invno=artrantmp.invno");
+            DBManager.ExecuteQuery("update ar SET ar.invno=artrantmp.id, octn='l' + CAST(artrantmp.id AS VARCHAR) from armaster ar inner join artrantmp on ar.invno=artrantmp.invno");
 
             int total = 0;
             double ca = 0;
@@ -309,7 +438,7 @@ namespace accouting_system_manager.Services
                 double.TryParse(r["ca"].ToString(), out ca);
             });
 
-            DBManager.ExecuteQuery(string.Format("update arshiftclose SET invcount={0}, totalvoucher={0}, totalamt={1};", total, ca));
+            //DBManager.ExecuteQuery(string.Format("update arshiftclose SET invcount={0}, totalvoucher={0}, totalamt={1};", total, ca));
             DBManager.ExecuteQuery(string.Format("update sysdata SET int1={0}, int2={1}, int3={1} WHERE sysid='AR';", total, total + 1));
             DBManager.ExecuteQuery(string.Format("update sysdata SET int1={0} WHERE sysid='GL';", total + 1));
             
@@ -317,7 +446,7 @@ namespace accouting_system_manager.Services
             callbackProgress?.Invoke(progress);
         }
 
-        private static void PrepareInvoiceNumbers(List<Artran> invoices, RunAction callbackProgress, bool rollback = true)
+        private static List<Artran> PrepareInvoiceNumbers(List<Artran> invoices, RunAction callbackProgress, bool rollback = true)
         {
             
             callbackProgress?.Invoke(new RunActionProgress() { Cursor = 0, NbData = invoices.Count, Message = "Prepare invoices" });
@@ -330,33 +459,83 @@ namespace accouting_system_manager.Services
 
             int max = maxArtran > maxArtrand ? maxArtran : maxArtrand;
 
+            Dictionary<int, int> idSwitch = new Dictionary<int, int>();
+
             foreach (var invoice in invoices)
             {
-
-                i++;
                 int no = 0;
 
                 if (int.TryParse(invoice.invno, out no))
                 {
-                    string newNo = (max + i).ToString();
+                    int newNo = 0;
 
-                    SetRemovedInvoiceNumber(invoice.invno, newNo, rollback);
+                    if (idSwitch.ContainsKey(no))
+                    {
+                        newNo = idSwitch[no];
+                    }
+                    else
+                    {
+                        i++;
+                        newNo = max + i;
+                        idSwitch.Add(no, newNo);
+                    }
 
-                    invoice.invno = newNo;
+                    invoice.invno = newNo.ToString();
                 }
-
-                callbackProgress?.Invoke(new RunActionProgress() { Cursor = i, NbData = invoices.Count, Message = "Prepare invoices" });
             }
+
+            SetRemovedInvoiceNumber(idSwitch, rollback);
+
+            callbackProgress?.Invoke(new RunActionProgress() { Cursor = i, NbData = invoices.Count, Message = "Prepare invoices" });
+
+            return invoices;
         }
 
-        private static void SetRemovedInvoiceNumber(string baseInvno, string newInvno, bool rollback)
+        private static void SetRemovedInvoiceNumber(Dictionary<int, int> ids, bool rollback)
         {
             var tableSuffix = rollback ? "d" : string.Empty;
 
-            DBManager.ExecuteQuery(string.Format("update artran{0} SET invno={1} WHERE invno={2}", tableSuffix, newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update arcash{0} SET invno={1}, ponum='Payment on invoice {1}', octn='R{1}', applyto='l{1}' WHERE invno={2}", tableSuffix, newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update ictran{0} SET docno={1}, reference='Invoice {1}' WHERE docno={2}", tableSuffix, newInvno, baseInvno));
-            DBManager.ExecuteQuery(string.Format("update armaster{0} SET invno={1},  octn='l{1}' WHERE invno={2}", tableSuffix, newInvno, baseInvno));
+            var queries = DBManager.ExplodeQueryInMany("INSERT INTO invnotmp VALUES", ids);
+
+            DBManager.ExecuteQueries(queries);
+
+            // var query = string.Empty;
+            // var i = 0;
+            // bool newQuery = true;
+            //
+            // foreach (var id in ids.Keys)
+            // {
+            //     i++;
+            //
+            //     if (newQuery)
+            //     {
+            //         query = ;
+            //         newQuery = false;
+            //     }
+            //     else if (i > 1)
+            //     {
+            //         query += ",";
+            //     }
+            //     
+            //     query += string.Format("({0}, {1})", id, ids[id]);
+            //
+            //     if (i % 1000 == 0 || i == ids.Keys.Count) {
+            //         newQuery = true;
+            //         queries.Add(query);
+            //     }
+            // }
+            //
+            // foreach (string q in queries)
+            // {
+            //     DBManager.ExecuteQuery(q);
+            // }
+            
+            DBManager.ExecuteQuery(string.Format("update ar SET ar.invno=invnotmp.new_invno FROM artran{0} ar inner join invnotmp ON ar.invno = invnotmp.invno", tableSuffix));
+            DBManager.ExecuteQuery(string.Format("update ar SET ar.invno=invnotmp.new_invno, ponum='Payment on invoice ' + CAST(invnotmp.new_invno AS VARCHAR), octn='R' + CAST(invnotmp.new_invno AS VARCHAR), applyto='l' + CAST(invnotmp.new_invno AS VARCHAR) FROM arcash{0} ar inner join invnotmp ON ar.invno = invnotmp.invno", tableSuffix));
+            DBManager.ExecuteQuery(string.Format("update ic SET docno=invnotmp.new_invno, reference='Invoice ' + CAST(invnotmp.new_invno AS VARCHAR) FROM ictran{0} ic inner join invnotmp ON ic.docno = invnotmp.invno ", tableSuffix));
+            DBManager.ExecuteQuery(string.Format("update ar SET ar.invno=invnotmp.new_invno,  octn='l' + CAST(invnotmp.new_invno AS VARCHAR) FROM armaster{0} ar inner join invnotmp ON ar.invno = invnotmp.invno", tableSuffix));
+
+            DBManager.ExecuteQuery("DELETE FROM invnotmp;");
         }
 
         private static int GetMaxInvno(string table = "artran")
@@ -383,9 +562,48 @@ namespace accouting_system_manager.Services
             return cols;
         }
 
+        private static Dictionary<string, List<Artran>> GetInvoices(DateTime from, DateTime to, bool removed = true)
+        {
+            var suffix = removed ? "d" : string.Empty;
+
+            Dictionary<string, List<Artran>> invoices = new Dictionary<string, List<Artran>>();
+
+            DBManager.RunQueryResults(string.Format("SELECT artran{0}.*, arcash{0}.paidamt total FROM artran{0} inner join arcash{0} on artran{0}.invno=arcash{0}.invno WHERE artran{0}.invdate BETWEEN '{1} 00:00:00' AND '{2} 23:59:59' ORDER BY artran{0}.invdate", suffix, GetStrDateDbFormat(from), GetStrDateDbFormat(to)), (SqlDataReader reader) =>
+            {
+                var invno = reader["invno"].ToString();
+
+                if (!invoices.ContainsKey(invno))
+                {
+                    invoices[invno] = new List<Artran>();
+                }
+
+                var inv = new Artran()
+                {
+                    invno = invno,
+                    fprice = reader["fprice"].ToString(),
+                    invdate = reader["invdate"].ToString(),
+                    itemcode = reader["itemcode"].ToString(),
+                    qtyorder = reader["qtyorder"].ToString(),
+                };
+                double total = 0;
+
+                double.TryParse(reader["total"].ToString(), out total);
+                inv.totalprice = Math.Round(total, 3);
+
+                invoices[invno].Add(inv);
+
+            });
+
+            return invoices;
+        }
+
         private static string GetStrDateDbFormat(DateTime date)
         {
             return date.ToString(DATE_DB_FORMAT);
+        }
+
+        private static bool IsTableHasIdentityInsert(string table) {
+            return table == "artran" || table == "ictran";
         }
     }
 }

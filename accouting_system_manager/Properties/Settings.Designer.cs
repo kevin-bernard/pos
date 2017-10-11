@@ -49,7 +49,7 @@ namespace accouting_system_manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ESQ")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ESQ+")]
         public string DB_NAME {
             get {
                 return ((string)(this["DB_NAME"]));
@@ -88,6 +88,18 @@ namespace accouting_system_manager.Properties {
         public string AUTH_PASS {
             get {
                 return ((string)(this["AUTH_PASS"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public string MIGRATION {
+            get {
+                return ((string)(this["MIGRATION"]));
+            }
+            set {
+                this["MIGRATION"] = value;
             }
         }
     }

@@ -38,6 +38,8 @@ namespace accouting_system_manager
 
         public DateTime To { get { return dtPickerTo.Value; } }
 
+        private double TotalPriceDeletedInvoice { get; set; }
+
         public FormCommands()
         {
             InitializeComponent();
@@ -65,32 +67,30 @@ namespace accouting_system_manager
             var invoices = InvoiceService.GetRemovedInvoices(From, To);
             lstViewOrders.Items.Clear();
 
+            TotalPriceDeletedInvoice = 0;
+
             foreach (var invno in invoices.Keys)
             {
 
-                ListViewItem item = new ListViewItem(invno);
+                InvoiceListViewItem item = new InvoiceListViewItem(invno);
+
                 string qty = string.Empty,
-                       fprice = string.Empty,
                        invdate = string.Empty,
                        name = string.Empty;
-
-                //foreach (var invoice in invoices[invno])
-                //{
-                //    name += invoice.itemcode + "\n";
-                //    qty += invoice.qtyorder + "\n";
-                //    fprice += invoice.fprice + "\n";
-                //    invdate += invoice.invdate + "\n";
-                //}
-
-                //item.SubItems.Add(name);
-                //item.SubItems.Add(qty);
-                //item.SubItems.Add(fprice);
+                
                 item.SubItems.Add(invoices[invno].First().invdate);
 
-                item.Tag = invoices[invno];
+                item.SubItems.Add(invoices[invno].First().totalprice.ToString());
+
+                item.Invoices = invoices[invno];
 
                 lstViewOrders.Items.Add(item);
+
+                TotalPriceDeletedInvoice += invoices[invno].First().totalprice;
             }
+
+            lblInfo.Text = string.Format("Total price: {0}", Math.Round(TotalPriceDeletedInvoice, 3).ToString());
+            lblInfo.Visible = true;
 
             OnListViewReloaded?.Invoke();
         }
@@ -175,9 +175,9 @@ namespace accouting_system_manager
         {
             List<Artran> invoices = new List<Artran>();
 
-            foreach (ListViewItem item in lstViewOrders.SelectedItems)
+            foreach (InvoiceListViewItem item in lstViewOrders.SelectedItems)
             {
-                if (item.Tag as List<Artran> != null) invoices.AddRange(((List<Artran>)item.Tag));
+                invoices.AddRange(item.Invoices);
             }
 
             StartWorker(new RemoveInvoiceArgs()
@@ -279,31 +279,9 @@ namespace accouting_system_manager
                 btnRecover.Enabled = lstViewOrders.SelectedItems.Count > 0;
 
                 OnWorkerDone?.Invoke();
-
-                lblInfo.Visible = false;
             }
         }
 
-        private class RemoveInvoiceArgs {
-
-            public enum Type
-            {
-                DELETE_BY_PERCENT = 1,
-                DELETE_BY_MIN_MAX = 2,
-                RECOVER = 3
-            }
-
-            public Type OperationType { get; set; }
-
-            public DateTime From { get; set; }
-
-            public DateTime To { get; set; }
-
-            public decimal Value { get; set; }
-
-            public List<Artran> Invoices { get; set; }
-        }
-        
         private void btnPreviousMonth_Click(object sender, EventArgs e)
         {
             var startDate = new DateTime(dtPickerTo.Value.Date.Year, dtPickerTo.Value.Date.Month, 1).AddMonths(-1);
@@ -335,5 +313,38 @@ namespace accouting_system_manager
         }
     }
 
+    class RemoveInvoiceArgs
+    {
+
+        public enum Type
+        {
+            DELETE_BY_PERCENT = 1,
+            DELETE_BY_MIN_MAX = 2,
+            RECOVER = 3
+        }
+
+        public Type OperationType { get; set; }
+
+        public DateTime From { get; set; }
+
+        public DateTime To { get; set; }
+
+        public decimal Value { get; set; }
+
+        public List<Artran> Invoices { get; set; }
+    }
+
+
+    class InvoiceListViewItem : ListViewItem
+    {
+        public List<Artran> Invoices { get; set; }
+
+        public string Invno { get; set; }
+
+        public InvoiceListViewItem(string invno) : base(invno)
+        {
+            Invno = invno;
+        }
+    }
 
 }

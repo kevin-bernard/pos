@@ -143,6 +143,7 @@
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.pnlButtons);
             this.IsMdiContainer = true;
+            this.MinimumSize = new System.Drawing.Size(648, 492);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Account System Manager";

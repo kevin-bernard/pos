@@ -1,0 +1,16 @@
+﻿2017-10-07 15:16:48.304 accouting_system_manager.log is created.
+2017-10-07 15:16:48.373 [ERROR]   The multi-part identifier "artran.invno" could not be bound.
+The multi-part identifier "artran.invdate" could not be bound.
+The multi-part identifier "artran.invdate" could not be bound.
+The column prefix 'artran' does not match with a table name or alias name used in the query.
+The multi-part identifier "artran.invdate" could not be bound.
+2017-10-07 18:06:11.379 [ERROR]   query: SET IDENTITY_INSERT artrand ON;, message:Table 'artrand' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:12.743 [ERROR]   query: SET IDENTITY_INSERT artrand OFF;, message:Table 'artrand' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:13.968 [ERROR]   query: SET IDENTITY_INSERT arcashd ON;, message:Table 'arcashd' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:14.819 [ERROR]   query: SET IDENTITY_INSERT arcashd OFF;, message:Table 'arcashd' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:15.621 [ERROR]   query: SET IDENTITY_INSERT ictrand ON;, message:Table 'ictrand' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:16.885 [ERROR]   query: SET IDENTITY_INSERT ictrand OFF;, message:Table 'ictrand' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:17.977 [ERROR]   query: SET IDENTITY_INSERT armasterd ON;, message:Table 'armasterd' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:18.790 [ERROR]   query: SET IDENTITY_INSERT armasterd OFF;, message:Table 'armasterd' does not have the identity property. Cannot perform SET operation.
+2017-10-07 18:06:25.598 [ERROR]   Index (zero based) must be greater than or equal to zero and less than the size of the argument list.
+2017-10-10 11:23:45.303 [ERROR]   query: DBCC CHECKIDENT (mytable, RESEED, 7503), message:Cannot find a table or object with the name "mytable". Check the system catalog.

@@ -15,6 +15,13 @@ namespace accouting_system_manager.DB
 
         public delegate void QueryResultCallback(SqlDataReader r);
 
+        public delegate void QueryExecResultCallback(bool success = true);
+        
+        public static bool IsConnectionOpen()
+        {
+            return connection == null ? false : connection.State == ConnectionState.Open;
+        }
+
         public static bool Init()
         {
             if (Connect(Properties.Settings.Default.SERVER_NAME, Properties.Settings.Default.DB_NAME, Properties.Settings.Default.DB_USER, Properties.Settings.Default.DB_PASSWORD))
@@ -61,10 +68,32 @@ namespace accouting_system_manager.DB
             connection.Open();
         }
 
-        public static int ExecuteQuery(string q) {
+        public static int ExecuteQuery(string q, bool withErrors = false) {
             SqlCommand command = GetCommand(q);
 
-            return command.ExecuteNonQuery();
+            try
+            {
+                return command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                LoggerSingleton.GetInstance.Error(string.Format("query: {0}, message:{1}", q, e.Message));
+
+                if (withErrors) throw e;
+
+                return -1;
+            }
+
+        }
+
+        public static void ExecuteQueries(List<string> queries, QueryExecResultCallback callback = null)
+        {
+            foreach (string q in queries)
+            {
+                bool success = ExecuteQuery(q) > 0;
+
+                callback?.Invoke(success);
+            }
         }
 
         public static void RunQueryResults(string query, QueryResultCallback callbk)
@@ -86,20 +115,93 @@ namespace accouting_system_manager.DB
             }
             catch(Exception e)
             {
-                LoggerSingleton.GetInstance.Error(e.Message);
+                LoggerSingleton.GetInstance.Error(string.Format("query:{0}, message:{1}", query, e.Message));
                 reader?.Close();
             }
         }
-        
+
+        public static List<string> ExplodeQueryInMany<T1, T2>(string baseQuery, Dictionary<T1, T2> elements)
+        {
+            var query = string.Empty;
+            var queries = new List<string>();
+            var i = 0;
+            bool newQuery = true;
+
+            foreach (dynamic el in elements.Keys)
+            {
+                i++;
+
+                if (newQuery)
+                {
+                    query = baseQuery;
+                    newQuery = false;
+                }
+                else if (i > 1)
+                {
+                    query += ",";
+                }
+
+                if (el is string)
+                {
+                    query += string.Format("('{0}', {1})", el, elements[el]);
+                }
+                else
+                {
+                    query += string.Format("({0}, {1})", el, elements[el]);
+                }
+                
+
+                if (i % 1000 == 0 || i == elements.Count)
+                {
+                    newQuery = true;
+                    queries.Add(query);
+                }
+            }
+
+            return queries;
+        }
+
+        public static bool Backup(string dbName, string path) {
+            
+            var query = string.Format("BACKUP DATABASE [{0}] TO DISK='{1}'", dbName, path);
+
+            try
+            {
+                ExecuteQuery(query, true);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private static SqlCommand GetCommand(string q)
         {
             CheckConnection();
 
-            return new SqlCommand(q, connection);
+            var command = new SqlCommand(q, connection);
+            command.CommandTimeout = 0;
+
+            return command;
         }
 
         private static void PrepareDB()
         {
+            try
+            {
+                GetCommand(string.Format("select TOP 1 invno from arcashd")).ExecuteReader().Close();
+            }
+            catch
+            {
+                CreateTables();
+            }
+        }
+        
+        private static void CreateTables()
+        {
+
             CreateTableFrom("arcash", "arcashd");
             CreateTableFrom("artran", "artrand");
             CreateTableFrom("ictran", "ictrand");
@@ -113,8 +215,31 @@ namespace accouting_system_manager.DB
             {
                 ExecuteQuery("CREATE TABLE artrantmp(id [decimal](18, 0) IDENTITY(1,1) NOT NULL, invno [bigint] NULL);");
             }
-        }
 
+            try
+            {
+                GetCommand("select top 1 * from invnotmp").ExecuteReader().Close();
+            }
+            catch
+            {
+                ExecuteQuery("CREATE TABLE invnotmp(invno [bigint] NULL, new_invno [bigint] NULL);");
+            }
+
+            try
+            {
+                GetCommand("select top 1 * from itemtrantmp").ExecuteReader().Close();
+            }
+            catch
+            {
+                ExecuteQuery(@"SELECT SERVERPROPERTY ('Collation'); 
+                               CREATE TABLE itemtrantmp(itemcode [nvarchar](25) COLLATE Croatian_BIN, 
+                                                        qtyorder [decimal](18, 6),  
+                                                        qtystock [decimal](18, 6), 
+                                                        totalqtyorder [decimal](18, 6) NULL, 
+                                                        lastsale [datetime] NULL, 
+                                                        cost [decimal](18, 6) NULL);");
+            }
+        }
 
         private static bool CreateTableFrom(string fromTable, string tableName)
         {

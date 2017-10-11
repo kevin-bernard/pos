@@ -52,6 +52,7 @@
             this.btnRecover = new System.Windows.Forms.Button();
             this.lstViewOrders = new System.Windows.Forms.ListView();
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.bgWorker = new System.ComponentModel.BackgroundWorker();
             this.panel1.SuspendLayout();
@@ -194,7 +195,7 @@
             this.pnlRemoveByMinMax.Controls.Add(this.numericUpDown1);
             this.pnlRemoveByMinMax.Location = new System.Drawing.Point(100, 34);
             this.pnlRemoveByMinMax.Name = "pnlRemoveByMinMax";
-            this.pnlRemoveByMinMax.Size = new System.Drawing.Size(359, 34);
+            this.pnlRemoveByMinMax.Size = new System.Drawing.Size(362, 34);
             this.pnlRemoveByMinMax.TabIndex = 10;
             // 
             // btnRemoveByMinMax
@@ -341,7 +342,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstViewOrders.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader5,
-            this.columnHeader4});
+            this.columnHeader4,
+            this.columnHeader1});
             this.lstViewOrders.FullRowSelect = true;
             this.lstViewOrders.GridLines = true;
             this.lstViewOrders.Location = new System.Drawing.Point(20, 173);
@@ -355,12 +357,17 @@
             // columnHeader5
             // 
             this.columnHeader5.Text = "Invoice number";
-            this.columnHeader5.Width = 155;
+            this.columnHeader5.Width = 89;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Price";
+            this.columnHeader1.Width = 78;
             // 
             // columnHeader4
             // 
             this.columnHeader4.Text = "Date";
-            this.columnHeader4.Width = 212;
+            this.columnHeader4.Width = 191;
             // 
             // bgWorker
             // 
@@ -417,6 +424,7 @@
         private System.Windows.Forms.Button btnNextMonth;
         private System.Windows.Forms.Button btnPreviousMonth;
         private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
     }
 }
 

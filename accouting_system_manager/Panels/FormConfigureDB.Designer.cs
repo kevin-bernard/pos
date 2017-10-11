@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.pnlMain = new System.Windows.Forms.Panel();
+            this.btnSave = new System.Windows.Forms.Button();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
@@ -38,6 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.pnlMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -46,6 +48,7 @@
             this.pnlMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlMain.Controls.Add(this.btnSave);
             this.pnlMain.Controls.Add(this.txtUsername);
             this.pnlMain.Controls.Add(this.label4);
             this.pnlMain.Controls.Add(this.btnTest);
@@ -59,6 +62,17 @@
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(431, 319);
             this.pnlMain.TabIndex = 0;
+            // 
+            // btnSave
+            // 
+            this.btnSave.BackgroundImage = global::accouting_system_manager.Properties.Resources.db_export;
+            this.btnSave.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnSave.Location = new System.Drawing.Point(263, 16);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(72, 71);
+            this.btnSave.TabIndex = 10;
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // txtUsername
             // 
@@ -136,6 +150,10 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Serveur Name :";
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
+            // 
             // FormConfigureDB
             // 
             this.AcceptButton = this.btnTest;
@@ -163,5 +181,7 @@
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
