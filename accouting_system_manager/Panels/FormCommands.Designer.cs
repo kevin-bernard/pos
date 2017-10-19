@@ -52,9 +52,10 @@
             this.btnRecover = new System.Windows.Forms.Button();
             this.lstViewOrders = new System.Windows.Forms.ListView();
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.bgWorker = new System.ComponentModel.BackgroundWorker();
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.pnlRemoveByMinMax.SuspendLayout();
@@ -213,7 +214,7 @@
             this.numericUpDown2.BackColor = System.Drawing.SystemColors.Window;
             this.numericUpDown2.Location = new System.Drawing.Point(147, 5);
             this.numericUpDown2.Maximum = new decimal(new int[] {
-            20000,
+            50000,
             0,
             0,
             0});
@@ -240,7 +241,7 @@
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(3, 5);
             this.numericUpDown1.Maximum = new decimal(new int[] {
-            19999,
+            50000,
             0,
             0,
             0});
@@ -328,7 +329,7 @@
             this.btnRecover.BackgroundImage = global::accouting_system_manager.Properties.Resources.icons8_Reset_96;
             this.btnRecover.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.btnRecover.Enabled = false;
-            this.btnRecover.Location = new System.Drawing.Point(398, 171);
+            this.btnRecover.Location = new System.Drawing.Point(411, 173);
             this.btnRecover.Name = "btnRecover";
             this.btnRecover.Size = new System.Drawing.Size(49, 48);
             this.btnRecover.TabIndex = 8;
@@ -343,12 +344,13 @@
             this.lstViewOrders.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader5,
             this.columnHeader4,
+            this.columnHeader2,
             this.columnHeader1});
             this.lstViewOrders.FullRowSelect = true;
             this.lstViewOrders.GridLines = true;
             this.lstViewOrders.Location = new System.Drawing.Point(20, 173);
             this.lstViewOrders.Name = "lstViewOrders";
-            this.lstViewOrders.Size = new System.Drawing.Size(373, 251);
+            this.lstViewOrders.Size = new System.Drawing.Size(390, 251);
             this.lstViewOrders.TabIndex = 0;
             this.lstViewOrders.UseCompatibleStateImageBehavior = false;
             this.lstViewOrders.View = System.Windows.Forms.View.Details;
@@ -359,19 +361,24 @@
             this.columnHeader5.Text = "Invoice number";
             this.columnHeader5.Width = 89;
             // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Date";
+            this.columnHeader4.Width = 128;
+            // 
             // columnHeader1
             // 
             this.columnHeader1.Text = "Price";
             this.columnHeader1.Width = 78;
             // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Date";
-            this.columnHeader4.Width = 191;
-            // 
             // bgWorker
             // 
             this.bgWorker.WorkerReportsProgress = true;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Deleted at";
+            this.columnHeader2.Width = 90;
             // 
             // FormCommands
             // 
@@ -425,6 +432,7 @@
         private System.Windows.Forms.Button btnPreviousMonth;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }
 

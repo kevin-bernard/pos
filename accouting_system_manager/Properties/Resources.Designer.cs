@@ -190,5 +190,81 @@ namespace accouting_system_manager.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CREATE PROCEDURE [dbo].[reloadstock]
+        ///	(@itemcode nvarchar(25), @qtyorder int, @is_rollback int)
+        ///AS
+        ///BEGIN
+        ///	SET NOCOUNT ON;
+        ///    
+        ///    DECLARE @id INT
+        ///    DECLARE @tranqty INT
+        ///    DECLARE @totaltran INT
+        ///    DECLARE @continue INT
+        ///    DECLARE @commands CURSOR
+        ///	
+        ///	IF @is_rollback = 1
+        ///	BEGIN
+        ///		SET @continue = 0;
+        ///		UPDATE ic SET ic.tranqty=(ic.tranqty + @qtyorder), ic.stockqty=(ic.tranqty + @qtyorder) FROM ictran ic WHERE trantype=&apos;R&apos; AND tranno=(SELECT MAX(tranno) FROM ictran ic2 where ic2.itemcode=@i [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string stored_proc_reloadstock {
+            get {
+                return ResourceManager.GetString("stored_proc_reloadstock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CREATE TRIGGER [dbo].[T_Insert_Delete_Arcashd]
+        ///       ON  [dbo].[arcashd]
+        ///       AFTER INSERT, DELETE
+        ///    AS 
+        ///    BEGIN
+        ///        
+        ///        -- SET NOCOUNT ON added to prevent extra result sets from
+        ///        -- interfering with SELECT statements.
+        ///        SET NOCOUNT ON;
+        ///        
+        ///        -- insert
+        ///        IF EXISTS (SELECT * FROM inserted) AND NOT EXISTS(SELECT * FROM deleted)
+        ///        BEGIN
+        ///            INSERT INTO artrandate(invno) SELECT invno FROM inserted;
+        ///        END
+        ///
+        ///        -- delete
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string trigger_arcashd {
+            get {
+                return ResourceManager.GetString("trigger_arcashd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CREATE TRIGGER [dbo].[T_InsertItemTranTmp]
+        ///       ON  [dbo].[itemtrantmp]
+        ///       AFTER INSERT
+        ///    AS 
+        ///    BEGIN
+        ///        
+        ///        -- SET NOCOUNT ON added to prevent extra result sets from
+        ///        -- interfering with SELECT statements.
+        ///        SET NOCOUNT ON;
+        ///
+        ///        -- Insert statements for trigger here
+        ///        DECLARE @qtyorder INT
+        ///        DECLARE @is_rollback INT
+        ///        DECLARE @itemcode nvarchar(25)
+        ///		DECLARE @inserted CURSOR
+        ///		
+        ///        SET @inserted = CURSOR FOR
+        ///			SELECT qtyorder, ite [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string trigger_itemtrantmp {
+            get {
+                return ResourceManager.GetString("trigger_itemtrantmp", resourceCulture);
+            }
+        }
     }
 }

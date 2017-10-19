@@ -16,7 +16,10 @@ namespace accouting_system_manager.DB
         public delegate void QueryResultCallback(SqlDataReader r);
 
         public delegate void QueryExecResultCallback(bool success = true);
-        
+
+        public delegate void AddFieldToInsert(dynamic el);
+
+
         public static bool IsConnectionOpen()
         {
             return connection == null ? false : connection.State == ConnectionState.Open;
@@ -119,8 +122,9 @@ namespace accouting_system_manager.DB
                 reader?.Close();
             }
         }
+        
 
-        public static List<string> ExplodeQueryInMany<T1, T2>(string baseQuery, Dictionary<T1, T2> elements)
+        public static List<string> ExplodeQueryInMany<T1, T2>(string baseQuery, Dictionary<T1, T2> elements, params string[] otherFields)
         {
             var query = string.Empty;
             var queries = new List<string>();
@@ -143,13 +147,18 @@ namespace accouting_system_manager.DB
 
                 if (el is string)
                 {
-                    query += string.Format("('{0}', {1})", el, elements[el]);
+                    query += string.Format("('{0}', {1}", el, elements[el]);
                 }
                 else
                 {
-                    query += string.Format("({0}, {1})", el, elements[el]);
+                    query += string.Format("({0}, {1}", el, elements[el]);
                 }
-                
+
+                foreach (var otherVal in otherFields) {
+                    query += ", " + otherVal;
+                }
+
+                query += ")";
 
                 if (i % 1000 == 0 || i == elements.Count)
                 {
@@ -177,6 +186,25 @@ namespace accouting_system_manager.DB
             return true;
         }
 
+        public static string WhereQuery(string q, List<string> filters)
+        {
+            if (filters == null || filters.Count == 0) return q;
+
+            var finalQ = q;
+            bool hasWhere = false;
+
+            if (!finalQ.ToLower().Contains("where")) finalQ += " WHERE";
+            else hasWhere = true;
+
+            foreach (var filter in filters) {
+                finalQ += (hasWhere ? " AND " : " ") +  filter + " ";
+
+                hasWhere = true;
+            }
+
+            return finalQ;
+        }
+
         private static SqlCommand GetCommand(string q)
         {
             CheckConnection();
@@ -189,6 +217,7 @@ namespace accouting_system_manager.DB
 
         private static void PrepareDB()
         {
+            ExecuteQuery(@" ");
             try
             {
                 GetCommand(string.Format("select TOP 1 invno from arcashd")).ExecuteReader().Close();
@@ -237,8 +266,17 @@ namespace accouting_system_manager.DB
                                                         qtystock [decimal](18, 6), 
                                                         totalqtyorder [decimal](18, 6) NULL, 
                                                         lastsale [datetime] NULL, 
-                                                        cost [decimal](18, 6) NULL);");
+                                                        cost [decimal](18, 6) NULL,
+                                                        is_rollback integer NULL);");
+
+                ExecuteQuery("CREATE TABLE logs(id [decimal](18, 0) IDENTITY(1,1) NOT NULL, message varchar(255));");
+
+                ExecuteQuery(Properties.Resources.stored_proc_reloadstock);
+                ExecuteQuery(Properties.Resources.trigger_itemtrantmp);
             }
+
+            ExecuteQuery("CREATE TABLE artrandate([invno] [bigint] NULL, [createdat][datetime] NULL default CURRENT_TIMESTAMP);");
+            ExecuteQuery(Properties.Resources.trigger_arcashd);
         }
 
         private static bool CreateTableFrom(string fromTable, string tableName)

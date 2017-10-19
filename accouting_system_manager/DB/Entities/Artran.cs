@@ -22,6 +22,8 @@ namespace accouting_system_manager.DB.Entities
 
         public string cost { get; set; }
 
+        public string deletedat { get; set; }
+
         public int GetInvnoToInt() {
             int no = 0;
 

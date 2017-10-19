@@ -80,6 +80,8 @@ namespace accouting_system_manager
                 
                 item.SubItems.Add(invoices[invno].First().invdate);
 
+                item.SubItems.Add(invoices[invno].First().deletedat);
+
                 item.SubItems.Add(invoices[invno].First().totalprice.ToString());
 
                 item.Invoices = invoices[invno];
@@ -89,7 +91,7 @@ namespace accouting_system_manager
                 TotalPriceDeletedInvoice += invoices[invno].First().totalprice;
             }
 
-            lblInfo.Text = string.Format("Total price: {0}", Math.Round(TotalPriceDeletedInvoice, 3).ToString());
+            lblInfo.Text = string.Format("Total price: {0}, Nb Invoices: {1}", Math.Round(TotalPriceDeletedInvoice, 3).ToString(), invoices.Count);
             lblInfo.Visible = true;
 
             OnListViewReloaded?.Invoke();
